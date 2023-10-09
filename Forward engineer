@@ -1,0 +1,190 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+-- -----------------------------------------------------
+-- Schema johnpg
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema johnpg
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `johnpg` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
+USE `johnpg` ;
+
+-- -----------------------------------------------------
+-- Table `johnpg`.`Aircraft`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `johnpg`.`Aircraft` (
+  `TailNo` INT NOT NULL,
+  `PilotId` CHAR(5) NOT NULL,
+  `WSO_Nav` CHAR(5) NULL DEFAULT NULL,
+  `Engineer` CHAR(5) NULL DEFAULT NULL,
+  `Type` VARCHAR(15) NULL DEFAULT NULL,
+  `Seater` VARCHAR(25) NULL DEFAULT NULL,
+  `Manufacturer` VARCHAR(40) NULL DEFAULT NULL,
+  PRIMARY KEY (`TailNo`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `johnpg`.`Base`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `johnpg`.`Base` (
+  `BaseId` INT NOT NULL,
+  `Command` VARCHAR(30) NOT NULL,
+  `Commander` CHAR(5) NOT NULL,
+  `State` VARCHAR(30) NOT NULL,
+  `Location` VARCHAR(30) NULL DEFAULT NULL,
+  `Type` VARCHAR(15) NULL DEFAULT NULL,
+  `NoOfAircraft` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`BaseId`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `johnpg`.`Commander`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `johnpg`.`Commander` (
+  `CommanderID` CHAR(5) NOT NULL,
+  `Name` VARCHAR(20) NULL DEFAULT NULL,
+  `No_Of_Personnel` INT NULL DEFAULT NULL,
+  `Base` INT NOT NULL,
+  PRIMARY KEY (`CommanderID`),
+  CONSTRAINT `Commander_ibfk_1`
+    FOREIGN KEY (`Base`)
+    REFERENCES `johnpg`.`Base` (`BaseId`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+CREATE INDEX `Base` ON `johnpg`.`Commander` (`Base` ASC) VISIBLE;
+
+
+-- -----------------------------------------------------
+-- Table `johnpg`.`Dependent`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `johnpg`.`Dependent` (
+  `DependentID` CHAR(5) NOT NULL,
+  `Personnel` CHAR(5) NULL DEFAULT NULL,
+  `DependentName` VARCHAR(20) NOT NULL,
+  `Relation` CHAR(10) NULL DEFAULT NULL,
+  PRIMARY KEY (`DependentID`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `johnpg`.`FlightLog`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `johnpg`.`FlightLog` (
+  `PilotId` CHAR(5) NULL DEFAULT NULL,
+  `Aircraft` INT NOT NULL,
+  `Hours` INT NULL DEFAULT NULL,
+  `LastInspected` DATE NULL DEFAULT NULL,
+  `NextInspection` DATE NULL DEFAULT NULL,
+  PRIMARY KEY (`Aircraft`),
+  CONSTRAINT `FlightLog_ibfk_1`
+    FOREIGN KEY (`Aircraft`)
+    REFERENCES `johnpg`.`Aircraft` (`TailNo`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `johnpg`.`Parts`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `johnpg`.`Parts` (
+  `PartID` INT NOT NULL,
+  `Manufacturer` VARCHAR(30) NULL DEFAULT NULL,
+  `Part_Name` VARCHAR(45) NULL DEFAULT NULL,
+  `Aircraft` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`PartID`),
+  CONSTRAINT `Parts_ibfk_1`
+    FOREIGN KEY (`Aircraft`)
+    REFERENCES `johnpg`.`Aircraft` (`TailNo`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+CREATE INDEX `Aircraft` ON `johnpg`.`Parts` (`Aircraft` ASC) VISIBLE;
+
+
+-- -----------------------------------------------------
+-- Table `johnpg`.`Personnel`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `johnpg`.`Personnel` (
+  `PersonnelID` CHAR(5) NOT NULL,
+  `Name` VARCHAR(20) NOT NULL,
+  `Ranks` VARCHAR(15) NOT NULL,
+  `Branch` VARCHAR(20) NOT NULL,
+  `CommanderID` CHAR(5) NULL DEFAULT NULL,
+  `BaseID` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`PersonnelID`))
+ENGINE = ARCHIVE
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+CREATE INDEX `CommanderID` ON `johnpg`.`Personnel` (`CommanderID` ASC) VISIBLE;
+
+CREATE INDEX `BaseID` ON `johnpg`.`Personnel` (`BaseID` ASC) VISIBLE;
+
+
+-- -----------------------------------------------------
+-- Table `johnpg`.`PayGrade`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `johnpg`.`PayGrade` (
+  `Personnel` CHAR(5) NOT NULL,
+  `Class` INT NULL DEFAULT NULL,
+  `Allowances` INT NULL DEFAULT NULL,
+  `AdditionalPay` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`Personnel`),
+  CONSTRAINT `PayGrade_ibfk_1`
+    FOREIGN KEY (`Personnel`)
+    REFERENCES `johnpg`.`Personnel` (`PersonnelID`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+-- -----------------------------------------------------
+-- Data for table `johnpg`.`Personnel`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `johnpg`;
+INSERT INTO `johnpg`.`Personnel` (`PersonnelID`, `Name`, `Ranks`, `Branch`, `CommanderID`, `BaseID`) VALUES ('P2323', 'Ravi Das', 'Flt Lt', 'Ground Duty', 'P6700', 6700);
+INSERT INTO `johnpg`.`Personnel` (`PersonnelID`, `Name`, `Ranks`, `Branch`, `CommanderID`, `BaseID`) VALUES ('P2324', 'Alok Sharma', 'Flt Lt', 'Flying', 'P6700', 6700);
+INSERT INTO `johnpg`.`Personnel` (`PersonnelID`, `Name`, `Ranks`, `Branch`, `CommanderID`, `BaseID`) VALUES ('P2301', 'Fernandez', 'Sqn Ldr', 'Flying', 'P6700', 6700);
+INSERT INTO `johnpg`.`Personnel` (`PersonnelID`, `Name`, `Ranks`, `Branch`, `CommanderID`, `BaseID`) VALUES ('P2425', 'Fidel Castro', 'Wg Cdr', 'Ground Duty', 'P3435', 6701);
+INSERT INTO `johnpg`.`Personnel` (`PersonnelID`, `Name`, `Ranks`, `Branch`, `CommanderID`, `BaseID`) VALUES ('P1002', 'Che Guevera', 'Sqn Ldr', 'Administrative', 'P3435', 6701);
+INSERT INTO `johnpg`.`Personnel` (`PersonnelID`, `Name`, `Ranks`, `Branch`, `CommanderID`, `BaseID`) VALUES ('P5643', 'Joe Biden', 'Flt Lt', 'Meterology', 'P3435', 6701);
+INSERT INTO `johnpg`.`Personnel` (`PersonnelID`, `Name`, `Ranks`, `Branch`, `CommanderID`, `BaseID`) VALUES ('P9021', 'Donny Darko', 'Wg Cdr', 'Ground Duty', 'P3435', 6701);
+INSERT INTO `johnpg`.`Personnel` (`PersonnelID`, `Name`, `Ranks`, `Branch`, `CommanderID`, `BaseID`) VALUES ('P5412', 'Jarhead', 'Wg Cdr', 'Flying', 'P6700', 6700);
+INSERT INTO `johnpg`.`Personnel` (`PersonnelID`, `Name`, `Ranks`, `Branch`, `CommanderID`, `BaseID`) VALUES ('P4567', 'Soman', 'Wg Cdr', 'Ground Duty', 'P3435', 6701);
+INSERT INTO `johnpg`.`Personnel` (`PersonnelID`, `Name`, `Ranks`, `Branch`, `CommanderID`, `BaseID`) VALUES ('P4890', 'Lil Nas X', 'Flt Lt', 'Flying', 'P3435', 6701);
+INSERT INTO `johnpg`.`Personnel` (`PersonnelID`, `Name`, `Ranks`, `Branch`, `CommanderID`, `BaseID`) VALUES ('P4756', 'Tupac', 'Flt Lt', 'Ground Duty', 'P3435', 6701);
+INSERT INTO `johnpg`.`Personnel` (`PersonnelID`, `Name`, `Ranks`, `Branch`, `CommanderID`, `BaseID`) VALUES ('P4892', 'Eminem', 'Sqn Ldr', 'Engineering', 'P3435', 6701);
+INSERT INTO `johnpg`.`Personnel` (`PersonnelID`, `Name`, `Ranks`, `Branch`, `CommanderID`, `BaseID`) VALUES ('P4409', 'Bhagya Sajith', 'Sqn Ldr', 'Engineering', 'P3435', 6701);
+INSERT INTO `johnpg`.`Personnel` (`PersonnelID`, `Name`, `Ranks`, `Branch`, `CommanderID`, `BaseID`) VALUES ('P8790', 'Aiswarya Sateesh', 'Sqn Ldr', 'Flying', 'P3435', 6701);
+INSERT INTO `johnpg`.`Personnel` (`PersonnelID`, `Name`, `Ranks`, `Branch`, `CommanderID`, `BaseID`) VALUES ('P5678', 'Chanchal Santosh', 'Flt Lt', 'ATC', 'P3435', 6701);
+INSERT INTO `johnpg`.`Personnel` (`PersonnelID`, `Name`, `Ranks`, `Branch`, `CommanderID`, `BaseID`) VALUES ('P9009', 'Darshana Das K', 'Wg Cdr', 'ATC', 'P3435', 6701);
+INSERT INTO `johnpg`.`Personnel` (`PersonnelID`, `Name`, `Ranks`, `Branch`, `CommanderID`, `BaseID`) VALUES ('P7887', 'Mimi', 'Flt Lt', 'Meterology', 'P6700', 6702);
+
+COMMIT;
+
+
